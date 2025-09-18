@@ -1,0 +1,41 @@
+@startuml
+class Game {
+    - Board board
+    - List<Player> players
+    - Dice dice
+    + startGame()
+    + playTurn()
+}
+
+class Board {
+    - int size
+    - List<Snake> snakes
+    - List<Ladder> ladders
+}
+
+class Snake {
+    - int start
+    - int end
+}
+
+class Ladder {
+    - int start
+    - int end
+}
+
+class Player {
+    - String name
+    - int position
+    + move(int steps)
+}
+
+class Dice {
+    + int roll()
+}
+
+Game --> Board
+Game --> Dice
+Game --> Player
+Board --> Snake
+Board --> Ladder
+@enduml
