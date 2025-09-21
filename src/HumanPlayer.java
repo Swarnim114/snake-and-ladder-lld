@@ -1,20 +1,23 @@
 public class HumanPlayer extends Player {
-    private String name;
-    private Coordinate position;
-
-    @Override
-    public String getName() {
-        return name;
+    public HumanPlayer(String name) {
+        super(name);
     }
 
     @Override
-    public Coordinate getPosition() {
-        return position;
-    }
+    public void move(int steps) {
+        Coordinate currentPos = getPosition();
 
-    @Override
-    public void setPosition(Coordinate position) {
-        this.position = position;
-    }
+        int currentPosition = (currentPos.getY() * 10) + currentPos.getX() + 1;
 
+        int newPosition = currentPosition + steps;
+
+        if (newPosition > 100) {
+            newPosition = 100; // Stay at final position if overshot
+        }
+
+        int newX = (newPosition - 1) % 10;
+        int newY = (newPosition - 1) / 10;
+
+        setPosition(new Coordinate(newX, newY));
+    }
 }

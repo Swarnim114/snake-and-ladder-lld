@@ -9,10 +9,9 @@ public class Snake extends BoardEntity {
     }
 
     @Override
-    void applyEffect(Player player) {
-        if (this.getStart() == player.getPosition()) {
+    public void applyEffect(Player player) {
+        if (this.getStart().equals(player.getPosition())) {
             player.setPosition(getEnd());
         }
     }
-
 }

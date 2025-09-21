@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class EasyBoardSetup implements IBoardSetupStrategy {
+public class MediumBoardSetup implements IBoardSetupStrategy {
     private final Random random;
 
-    public EasyBoardSetup() {
+    public MediumBoardSetup() {
         this.random = new Random();
     }
 
@@ -13,9 +13,9 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
     public List<BoardEntity> setupEntities(int height, int width, BoardEntityFactory factory) {
         List<BoardEntity> entities = new ArrayList<>();
 
-        // Easy: Less snakes (3-5), more ladders (8-12)
-        int numSnakes = 3 + random.nextInt(3); // 3-5 snakes
-        int numLadders = 8 + random.nextInt(5); // 8-12 ladders
+        // Medium: Balanced snakes (6-8) and ladders (6-8)
+        int numSnakes = 6 + random.nextInt(3); // 6-8 snakes
+        int numLadders = 6 + random.nextInt(3); // 6-8 ladders
 
         // Create snakes
         for (int i = 0; i < numSnakes; i++) {
@@ -34,8 +34,8 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
 
     private Coordinate[] generateRandomSnakeCoordinates(int height, int width) {
         // Generate snake: start higher, end lower
-        int startPosition = 20 + random.nextInt(60); // Position 21-80 (avoid too early/late)
-        int endPosition = 1 + random.nextInt(startPosition - 10); // At least 10 positions down
+        int startPosition = 15 + random.nextInt(70); // Position 16-85
+        int endPosition = 1 + random.nextInt(startPosition - 5); // At least 5 positions down
 
         Coordinate start = positionToCoordinate(startPosition, width);
         Coordinate end = positionToCoordinate(endPosition, width);
@@ -45,11 +45,11 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
 
     private Coordinate[] generateRandomLadderCoordinates(int height, int width) {
         // Generate ladder: start lower, end higher
-        int startPosition = 2 + random.nextInt(70); // Position 3-72 (avoid starting/ending squares)
-        int endPosition = startPosition + 10 + random.nextInt(20); // At least 10 positions up
+        int startPosition = 2 + random.nextInt(75); // Position 3-77
+        int endPosition = startPosition + 5 + random.nextInt(15); // At least 5 positions up
 
         if (endPosition > height * width - 1) {
-            endPosition = height * width - 5; // Don't go too close to end
+            endPosition = height * width - 3;
         }
 
         Coordinate start = positionToCoordinate(startPosition, width);

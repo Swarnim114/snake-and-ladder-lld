@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class EasyBoardSetup implements IBoardSetupStrategy {
+public class HardBoardSetup implements IBoardSetupStrategy {
     private final Random random;
 
-    public EasyBoardSetup() {
+    public HardBoardSetup() {
         this.random = new Random();
     }
 
@@ -13,9 +13,9 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
     public List<BoardEntity> setupEntities(int height, int width, BoardEntityFactory factory) {
         List<BoardEntity> entities = new ArrayList<>();
 
-        // Easy: Less snakes (3-5), more ladders (8-12)
-        int numSnakes = 3 + random.nextInt(3); // 3-5 snakes
-        int numLadders = 8 + random.nextInt(5); // 8-12 ladders
+        // Hard: More snakes (8-12), less ladders (3-5)
+        int numSnakes = 8 + random.nextInt(5); // 8-12 snakes
+        int numLadders = 3 + random.nextInt(3); // 3-5 ladders
 
         // Create snakes
         for (int i = 0; i < numSnakes; i++) {
@@ -33,9 +33,9 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
     }
 
     private Coordinate[] generateRandomSnakeCoordinates(int height, int width) {
-        // Generate snake: start higher, end lower
-        int startPosition = 20 + random.nextInt(60); // Position 21-80 (avoid too early/late)
-        int endPosition = 1 + random.nextInt(startPosition - 10); // At least 10 positions down
+        // Generate snake: start higher, end lower (more aggressive snakes)
+        int startPosition = 10 + random.nextInt(80); // Position 11-90 (wider range)
+        int endPosition = 1 + random.nextInt(startPosition - 2); // At least 2 positions down
 
         Coordinate start = positionToCoordinate(startPosition, width);
         Coordinate end = positionToCoordinate(endPosition, width);
@@ -44,12 +44,12 @@ public class EasyBoardSetup implements IBoardSetupStrategy {
     }
 
     private Coordinate[] generateRandomLadderCoordinates(int height, int width) {
-        // Generate ladder: start lower, end higher
-        int startPosition = 2 + random.nextInt(70); // Position 3-72 (avoid starting/ending squares)
-        int endPosition = startPosition + 10 + random.nextInt(20); // At least 10 positions up
+        // Generate ladder: start lower, end higher (fewer, shorter ladders)
+        int startPosition = 2 + random.nextInt(60); // Position 3-62 (smaller range)
+        int endPosition = startPosition + 3 + random.nextInt(10); // Shorter ladders (3-12 positions)
 
         if (endPosition > height * width - 1) {
-            endPosition = height * width - 5; // Don't go too close to end
+            endPosition = height * width - 2;
         }
 
         Coordinate start = positionToCoordinate(startPosition, width);

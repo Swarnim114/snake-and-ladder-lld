@@ -1,13 +1,13 @@
 public abstract class BoardEntity {
-    private Coordinate start;
-    private Coordinate end;
+    private final Coordinate start;
+    private final Coordinate end;
 
     public BoardEntity(Coordinate start, Coordinate end) {
         this.start = start;
         this.end = end;
     }
 
-    abstract void applyEffect(Player player);
+    public abstract void applyEffect(Player player);
 
     public Coordinate getStart() {
         return start;
