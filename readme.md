@@ -14,3 +14,273 @@
 ### ideas 
 - builder pattern as game builder 
 - dice will be singleton 
+- Factory for board entities
+
+
+### Class Diagram 
+
+![class diagram image](class.png)
+
+
+### PUML 
+````
+    @startuml
+title Snake and Ladder Game - Class Diagram
+
+class App {
+  + static main(String[])
+}
+
+class Game {
+  - Board board
+  - List<Player> players
+  - Dice dice
+  - TurnManager turnManager
+  - StartRule startRule
+  - WinRule winRule
+  - EndRule endRule
+  + Game(Board, List<Player>, Dice, TurnManager, StartRule, WinRule, EndRule)
+  + start()
+  + playTurn()
+}
+
+class GameBuilder {
+  - Board board
+  - List<Player> players
+  - Dice dice
+  - TurnManager turnManager
+  - StartRule startRule
+  - WinRule winRule
+  - EndRule endRule
+  - int boardHeight = 10
+  - int boardWidth = 10
+  - Difficulty difficulty = EASY
+  + GameBuilder()
+  + setBoard(Board) : GameBuilder
+  + setBoardDimensions(int, int) : GameBuilder
+  + setDifficulty(Difficulty) : GameBuilder
+  + addPlayer(Player) : GameBuilder
+  + setDice(Dice) : GameBuilder
+  + setTurnManager(TurnManager) : GameBuilder
+  + setStartRule(StartRule) : GameBuilder
+  + setWinRule(WinRule) : GameBuilder
+  + setEndRule(EndRule) : GameBuilder
+  + build() : Game
+}
+
+abstract class Player {
+  - String name
+  - Coordinate position
+  + Player(String)
+  + move(int steps)
+  + getPosition() : Coordinate
+  + setPosition(Coordinate)
+  + getName() : String
+}
+
+class HumanPlayer {
+  + HumanPlayer(String)
+  + move(int steps)
+}
+
+class Dice {
+  - static Dice instance
+  - Random random
+  - int sides
+  - Dice()
+  + getInstance() : Dice
+  + roll() : int
+  + getSides() : int
+  + setSides(int)
+}
+
+abstract class BoardEntity {
+  - Coordinate start
+  - Coordinate end
+  + BoardEntity(Coordinate, Coordinate)
+  + getStart() : Coordinate
+  + getEnd() : Coordinate
+  + applyEffect(Player)
+}
+
+class Snake {
+  + Snake(Coordinate, Coordinate)
+  + applyEffect(Player)
+}
+
+class Ladder {
+  + Ladder(Coordinate, Coordinate)
+  + applyEffect(Player)
+}
+
+interface BoardEntityFactory {
+  + createSnake(Coordinate, Coordinate) : Snake
+  + createLadder(Coordinate, Coordinate) : Ladder
+}
+
+class DefaultBoardEntityFactory {
+  + createSnake(Coordinate, Coordinate) : Snake
+  + createLadder(Coordinate, Coordinate) : Ladder
+}
+
+class Coordinate {
+  - int x
+  - int y
+  + Coordinate(int, int)
+  + getX() : int
+  + getY() : int
+  + setX(int)
+  + setY(int)
+  + equals(Object) : boolean
+  + hashCode() : int
+  + toString() : String
+}
+
+class Board {
+  - int height
+  - int width
+  - List<BoardEntity> entities
+  + Board(int, int, List<BoardEntity>)
+  + getHeight() : int
+  + getWidth() : int
+  + addEntity(BoardEntity)
+  + applyEffects(Player)
+  + coordinateToPosition(Coordinate) : int
+  + positionToCoordinate(int) : Coordinate
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+class BoardSetupFactory {
+  + static createBoardSetup(Difficulty) : IBoardSetupStrategy
+}
+
+interface IBoardSetupStrategy {
+  + setupEntities(int, int, BoardEntityFactory) : List<BoardEntity>
+}
+
+class EasyBoardSetup {
+  - Random random
+  + EasyBoardSetup()
+  + setupEntities(int, int, BoardEntityFactory) : List<BoardEntity>
+  // Less snakes (3-5), more ladders (8-12)
+}
+
+class MediumBoardSetup {
+  - Random random
+  + MediumBoardSetup()
+  + setupEntities(int, int, BoardEntityFactory) : List<BoardEntity>
+  // Balanced snakes (6-8) and ladders (6-8)
+}
+
+class HardBoardSetup {
+  - Random random
+  + HardBoardSetup()
+  + setupEntities(int, int, BoardEntityFactory) : List<BoardEntity>
+  // More snakes (8-12), less ladders (3-5)
+}
+
+class TurnManager {
+  - Queue<Player> playerQueue
+  + TurnManager(List<Player>)
+  + nextPlayer() : Player
+}
+
+interface StartRule {
+  + canStart(int roll) : boolean
+}
+
+class StartOnSixRule {
+  + canStart(int roll) : boolean
+}
+
+class StartAnywhereRule {
+  + canStart(int roll) : boolean
+}
+
+interface WinRule {
+  + hasWon(Player p, Board b) : boolean
+}
+
+class ExactWinRule {
+  + hasWon(Player p, Board b) : boolean
+}
+
+class OvershootWinRule {
+  + hasWon(Player p, Board b) : boolean
+}
+
+interface EndRule {
+  + isGameOver(List<Player> players, Board b) : boolean
+}
+
+class SingleWinnerEndRule {
+  + isGameOver(List<Player> players, Board b) : boolean
+}
+
+class LastManStandingEndRule {
+  + isGameOver(List<Player> players, Board b) : boolean
+}
+
+' Relationships
+App --> GameBuilder
+App --> Game
+
+Game --> Board
+Game --> Player
+Game --> Dice
+Game --> TurnManager
+Game --> StartRule
+Game --> WinRule
+Game --> EndRule
+
+GameBuilder --> Game
+GameBuilder --> Board
+GameBuilder --> Player
+GameBuilder --> Dice
+GameBuilder --> TurnManager
+GameBuilder --> StartRule
+GameBuilder --> WinRule
+GameBuilder --> EndRule
+GameBuilder --> Difficulty
+GameBuilder ..> BoardEntityFactory : uses
+GameBuilder ..> BoardSetupFactory : uses
+
+Player <|-- HumanPlayer
+Player --> Coordinate
+
+Board --> BoardEntity
+Board --> IBoardSetupStrategy
+
+BoardEntity <|-- Snake
+BoardEntity <|-- Ladder
+BoardEntity --> Coordinate
+
+BoardEntityFactory <|.. DefaultBoardEntityFactory
+BoardEntityFactory --> Snake
+BoardEntityFactory --> Ladder
+
+BoardSetupFactory --> IBoardSetupStrategy
+BoardSetupFactory --> Difficulty
+
+IBoardSetupStrategy <|.. EasyBoardSetup
+IBoardSetupStrategy <|.. MediumBoardSetup
+IBoardSetupStrategy <|.. HardBoardSetup
+IBoardSetupStrategy --> BoardEntityFactory
+
+StartRule <|.. StartOnSixRule
+StartRule <|.. StartAnywhereRule
+
+WinRule <|.. ExactWinRule
+WinRule <|.. OvershootWinRule
+
+EndRule <|.. SingleWinnerEndRule
+EndRule <|.. LastManStandingEndRule
+
+@enduml
+
+```
